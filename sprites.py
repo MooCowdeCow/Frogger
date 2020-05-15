@@ -46,5 +46,11 @@ class Wall(pg.sprite.Sprite):
 
 class Car(pg.sprite.Sprite):
     def __init__(self, game, vx, vy):
-        self.groups = game.all_sprites, game.cars
+        Sprite.__init__
+        self.groups = game.all_sprites, game.car
         pg.sprite.Sprite._init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0, 0

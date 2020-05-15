@@ -8,6 +8,7 @@ import sys
 from os import path
 from settings import *
 from sprites import *
+from camera import *
 
 #Game window initialization
 class Game:
@@ -21,10 +22,11 @@ class Game:
 
     def load_data(self):
         game_folder = path.dirname(__file__)
-        self.map_data = []
+        # img_folder = path.join(game_folder, 'img')
         with open(path.join(game_folder, 'map.txt'), 'rt') as f:
             for line in f:
                 self.map_data.append(line)
+        # self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
 
     def new(self):
         #Variable intialization
@@ -37,11 +39,11 @@ class Game:
                 if tile =='p':
                     self.Player = Player(self, col, row)
         self.player = Player(self, 10, 10)
-        # for x in range(10, 20):
-        #     Wall(self, x, 5)
+        #Camera to follow the player sprite
+        self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
-        #While loop to keep the game running until player exits the game
+        #While loop to keep the game running until player exits the game(clicks the red X)
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
@@ -53,21 +55,26 @@ class Game:
         #Player exits the game
         pg.quit()
         sys.exit()
+
     def update(self):
         #Sprite updates
         self.all_sprites.update()
-    def draw_grid(self):
-        #The grid dimensions
-        for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, LIGHT_GREY, (x, 0), (x, HEIGHT))
-        for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, LIGHT_GREY, (0, y), (WIDTH, y))
+        self.camera.update(self.player)
+    # def draw_grid(self):
+    #     #The grid dimensions
+    #     for x in range(0, WIDTH, TILESIZE):
+    #         pg.draw.line(self.screen, LIGHT_GREY, (x, 0), (x, HEIGHT))
+    #     for y in range(0, HEIGHT, TILESIZE):
+    #         pg.draw.line(self.screen, LIGHT_GREY, (0, y), (WIDTH, y))
+
     def draw(self):
         #The grid drawing sequence
         self.screen.fill(BG_COLOR)
-        self.draw_grid()
-        self.all_sprites.draw(self.screen)
+        # self.draw_grid()
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
         pg.display.flip()
+
     def events(self):
         #Player clicks the red X
         for event in pg.event.get():
@@ -83,13 +90,17 @@ class Game:
                     self.player.move(dy=-1)
                 if event.key == pg.K_s:
                     self.player.move(dy=1)
+
     def show_start_screen(self):
         pass
+
     def show_go_screen(self):
         pass
+
 #Game window opens
 g = Game()
 g.show_start_screen()
+
 while True:
     g.new()
     g.run()
