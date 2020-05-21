@@ -31,9 +31,6 @@ class Player(pg.sprite.Sprite):
                 return True
         return False
 
-    # def collide_with_mobs(self, dx=0, dy=0):
-    #     for 
-
     def update(self):
         self.rect.x = self.x * TILESIZE
         self.rect.y = self.y * TILESIZE
